@@ -1,0 +1,217 @@
+package baseRice;
+
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+
+
+public class Main {
+
+	public static final boolean DEBUG = true;
+	static JFrame frame = new JFrame();
+	static JPanel panel = new JPanel();
+	static JPanel panelButtons = new JPanel();
+	static Integer indexer = 1;
+	static ArrayList<RiceGrain> listOfRiceGrains = new ArrayList<RiceGrain>();
+	static ArrayList<String> listOfFiles = RicePotList.RicePotListGen();
+	static int gridBagLines = 0;
+	static GridBagConstraints textFieldConstraints = new GridBagConstraints();
+
+	public static void main(String[] args) {
+		try {
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+		} 
+		catch (UnsupportedLookAndFeelException e) {
+			// handle exception
+		}
+		catch (ClassNotFoundException e) {
+			// handle exception
+		}
+		catch (InstantiationException e) {
+			// handle exception
+		}
+		catch (IllegalAccessException e) {
+			// handle exception
+		}
+		
+
+
+		frame.setLayout(new GridBagLayout());
+		frame.setPreferredSize(new Dimension(470, 700));
+		frame.setTitle("Auto Ricer");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		frame.getContentPane().setBackground(new Color(51, 50, 47));
+
+		// Frame constraints
+		GridBagConstraints frameConstraints = new GridBagConstraints();
+
+		// Construct panel
+
+		panel.setLayout(new GridBagLayout());
+		panelButtons.setLayout(new GridBagLayout());
+		
+		panel.setBackground(new Color(51, 50, 47));
+
+		// Add panel to frame
+		frameConstraints.fill = GridBagConstraints.HORIZONTAL;
+		frameConstraints.gridx = 0;
+		frameConstraints.gridy = 0;
+		frameConstraints.weighty = 0.9;
+		frame.add(panel, frameConstraints);
+
+		frameConstraints.gridwidth = 1;
+		frameConstraints.fill = GridBagConstraints.HORIZONTAL;
+		frameConstraints.weighty = 0.1;
+		frameConstraints.weightx = 0.0;
+		frameConstraints.ipady = 20;
+		frameConstraints.gridx = 0;
+		frameConstraints.gridy = 9999;
+		frame.add(panelButtons, frameConstraints);
+		//panel.setBorder(LineBorder.createBlackLineBorder());
+		//panelButtons.setBorder(LineBorder.createBlackLineBorder());
+
+
+		buildRiceGrainList();
+
+
+		//Build GUI
+		textFieldConstraints.gridy = 0;
+		textFieldConstraints.fill = GridBagConstraints.HORIZONTAL;
+		textFieldConstraints.weightx = 0.5;
+		textFieldConstraints.insets = new Insets(10, 10, 10, 10);
+
+
+		String filename = "";
+		for(RiceGrain m: listOfRiceGrains) {
+			System.out.println("Description: " + m.description + " Value: " + m.value);
+			System.out.println(m.fileName + m.line + m.type );
+
+
+			textFieldConstraints.gridy = gridBagLines;
+
+			if (!filename.equals(m.fileName)) {
+
+				int index = m.fileName.lastIndexOf("/");
+
+				panel.add(new JLabel(m.fileName.substring(index+1)));
+
+				filename = m.fileName;
+				gridBagLines++;
+				textFieldConstraints.gridy = gridBagLines;
+			}
+
+			//JTextField g=new JTextField();
+			//m.textField.setText(m.value);
+			//m.label.setText(m.description);
+			panel.add(m.textField, textFieldConstraints);
+			panel.add(m.label, textFieldConstraints);
+
+			if (m.type==1){
+				panel.add(m.colorButton, textFieldConstraints);
+				panel.add(m.colorBox, textFieldConstraints);
+				m.colorBox.setPreferredSize(new Dimension(20, 20));
+			}
+
+			gridBagLines++;
+
+		}
+
+
+
+		// Construct button
+		JButton saveButton = new JButton("Save");
+		JButton resetButton = new JButton("Reset");
+
+		saveButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e)
+			{
+				//Execute when button is pressed
+				SaveRice.riceGrainsToFile(listOfRiceGrains);
+			}
+		}); 
+
+		resetButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e)
+			{
+				resetValues();
+			}
+		}); 
+
+
+		GridBagConstraints panelButtonsConstraints = new GridBagConstraints();
+		panelButtonsConstraints.gridy = 0;
+		panelButtonsConstraints.fill = GridBagConstraints.HORIZONTAL;
+		panelButtonsConstraints.weightx = 0.5;
+		panelButtonsConstraints.insets = new Insets(10, 10, 10, 10);
+		// Add button to frame
+		panelButtons.add(saveButton, panelButtonsConstraints);
+		panelButtons.add(resetButton, panelButtonsConstraints);
+		
+		panelButtons.setBackground(new Color(51, 50, 47));
+
+
+		textFieldConstraints.weightx = 1;
+		textFieldConstraints.weighty = 1;
+		textFieldConstraints.fill = GridBagConstraints.BOTH;
+
+		JScrollPane scrollpane = new JScrollPane(panel);
+		frame.getContentPane().add(scrollpane, textFieldConstraints);
+
+
+
+		// Pack frame
+		frame.pack();
+
+		// Make frame visible
+		frame.setVisible(true);
+		//panel.updateUI();
+
+
+		/*
+		gnome-specimen
+		try {
+			Runtime.getRuntime().exec("gnome-specimen");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			System.out.println("");
+		}
+
+		 */
+
+
+	}
+
+	public static void resetValues(){
+		for(RiceGrain m: listOfRiceGrains) {
+			//m.textField.setText(m.value);
+			m.reset();
+
+		}
+
+	}
+
+	public static void buildRiceGrainList(){		
+		for (int i = 0; i < listOfFiles.size(); i++) {
+			//System.out.println(listOfFiles.get(i));
+			listOfRiceGrains.addAll(RiceReader.readData(listOfFiles.get(i)));
+		}
+
+	}
+
+}
