@@ -22,8 +22,10 @@ A working user interface with save function and reset to last save stated. Also 
 ![alt tag](https://raw.githubusercontent.com/UltraNyan/autorice/master/Screenshots/shot1.png)
 
 ##Future Plans
-Replace xml editing with file selector and automatic conf file creation
-Add support for sqllite database for editing firefox userstyles from Autorice
-Write unit tests, ayy I never test my code, but when I do, I'll do it in production.
+--Replace xml editing with file selector and automatic conf file creation.
+
+--Add support for sqllite database for editing firefox userstyles from Autorice.
+
+--Write unit tests, ayy I never test my code, but when I do, I'll do it in production.
 
 
